@@ -15,10 +15,9 @@ public class PlayerControllet : MonoBehaviour
     public bool OnGround;
     public bool jump;
 
-    //攻撃条件、攻撃力
-    public bool AttackSwitch = false;
-    [SerializeField] public float Power = 0f;
-
+    //入力に応じて左右を反転させるかどうかのフラグ
+    bool flipX = true;
+    float m_scaleX;
     //体力
     [SerializeField] public float Life = 3f;
 
@@ -36,8 +35,12 @@ public class PlayerControllet : MonoBehaviour
         h = Input.GetAxis("Horizontal");
 
         // 各種入力を受け取る
-        if (Input.GetKey(KeyCode.Space) && OnGround == true)jump = true;        
-        if (Input.GetKeyDown(KeyCode.RightShift))AttackSwitch = true;      
+        if (Input.GetKey(KeyCode.Space) && OnGround == true)jump = true;
+
+        if (flipX)
+        {
+            FlipX(h);
+        }
     }
 
     private void FixedUpdate()
@@ -51,6 +54,7 @@ public class PlayerControllet : MonoBehaviour
             OnGround = false;
         }
 
+
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -59,5 +63,23 @@ public class PlayerControllet : MonoBehaviour
             OnGround = true;            
         }
         
+    }
+    void FlipX(float horizontal)
+    {
+        /*
+         * 左を入力されたらキャラクターを左に向ける。
+         * 左右を反転させるには、Transform:Scale:X に -1 を掛ける。
+         * Sprite Renderer の Flip:X を操作しても反転する。
+         * */
+        m_scaleX = this.transform.localScale.x;
+
+        if (horizontal > 0)
+        {
+            this.transform.localScale = new Vector3(Mathf.Abs(this.transform.localScale.x), this.transform.localScale.y, this.transform.localScale.z);
+        }
+        else if (horizontal < 0)
+        {
+            this.transform.localScale = new Vector3(-1 * Mathf.Abs(this.transform.localScale.x), this.transform.localScale.y, this.transform.localScale.z);
+        }
     }
 }
